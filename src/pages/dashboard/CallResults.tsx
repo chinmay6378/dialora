@@ -24,7 +24,7 @@ const CallResults = () => {
   return (
     <div className="space-y-6 max-w-6xl">
       <div>
-        <h1 className="text-3xl font-bold">Call Results</h1>
+        <h1 className="text-3xl font-bold text-foreground">Call Results</h1>
         <p className="text-muted-foreground mt-1">Review AI call outcomes and summaries.</p>
       </div>
 
@@ -35,7 +35,7 @@ const CallResults = () => {
             key={f}
             variant={filter === f ? "default" : "outline"}
             size="sm"
-            className={`rounded-xl ${filter === f ? "gradient-primary border-0" : ""}`}
+            className={`rounded-xl ${filter === f ? "gradient-primary border-0" : "border-border/50"}`}
             onClick={() => setFilter(f)}
           >
             {f === "all" ? "All" : f === "interested" ? "Interested" : "Not Interested"}
@@ -43,10 +43,10 @@ const CallResults = () => {
         ))}
       </div>
 
-      <div className="rounded-2xl glass overflow-hidden">
+      <div className="rounded-2xl glass-card overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-border">
+            <tr className="border-b border-border/30">
               <th className="text-left p-4 text-sm font-medium text-muted-foreground">Lead</th>
               <th className="text-left p-4 text-sm font-medium text-muted-foreground">Phone</th>
               <th className="text-left p-4 text-sm font-medium text-muted-foreground">Duration</th>
@@ -58,8 +58,8 @@ const CallResults = () => {
           </thead>
           <tbody>
             {filtered.map((c) => (
-              <tr key={c.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
-                <td className="p-4 font-medium">{c.name}</td>
+              <tr key={c.id} className="border-b border-border/20 last:border-0 hover:bg-muted/20 transition-colors">
+                <td className="p-4 font-medium text-foreground">{c.name}</td>
                 <td className="p-4 text-muted-foreground text-sm">{c.phone}</td>
                 <td className="p-4 text-muted-foreground text-sm">{c.duration}</td>
                 <td className="p-4 text-muted-foreground text-sm">{c.campaign}</td>
@@ -76,17 +76,17 @@ const CallResults = () => {
                         <Eye className="w-4 h-4" />
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="rounded-2xl">
+                    <DialogContent className="rounded-2xl glass-card border-border/50">
                       <DialogHeader>
-                        <DialogTitle>Call Summary — {c.name}</DialogTitle>
+                        <DialogTitle className="text-foreground">Call Summary — {c.name}</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-3 text-sm">
-                        <p><span className="text-muted-foreground">Phone:</span> {c.phone}</p>
-                        <p><span className="text-muted-foreground">Duration:</span> {c.duration}</p>
-                        <p><span className="text-muted-foreground">Campaign:</span> {c.campaign}</p>
-                        <div className="p-4 rounded-xl bg-muted">
+                        <p><span className="text-muted-foreground">Phone:</span> <span className="text-foreground">{c.phone}</span></p>
+                        <p><span className="text-muted-foreground">Duration:</span> <span className="text-foreground">{c.duration}</span></p>
+                        <p><span className="text-muted-foreground">Campaign:</span> <span className="text-foreground">{c.campaign}</span></p>
+                        <div className="p-4 rounded-xl bg-muted/30 border border-border/30">
                           <p className="text-muted-foreground text-xs mb-1">Summary</p>
-                          <p>{c.summary}</p>
+                          <p className="text-foreground">{c.summary}</p>
                         </div>
                       </div>
                     </DialogContent>

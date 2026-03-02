@@ -19,20 +19,20 @@ const Overview = () => {
   return (
     <div className="space-y-8 max-w-6xl">
       <div>
-        <h1 className="text-3xl font-bold">Overview</h1>
+        <h1 className="text-3xl font-bold text-foreground">Overview</h1>
         <p className="text-muted-foreground mt-1">Your campaign performance at a glance.</p>
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
-          <div key={stat.label} className="p-6 rounded-2xl glass hover:shadow-md transition-all group">
+          <div key={stat.label} className="p-6 rounded-2xl glass-card group">
             <div className="flex items-center justify-between mb-4">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <stat.icon className="w-5 h-5 text-primary" />
               </div>
               <ArrowUpRight className="w-4 h-4 text-success" />
             </div>
-            <p className="text-3xl font-bold">{stat.value}</p>
+            <p className="text-3xl font-bold text-foreground">{stat.value}</p>
             <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
             <p className="text-xs text-success mt-2 flex items-center gap-1">
               <TrendingUp className="w-3 h-3" /> {stat.change}
@@ -42,20 +42,20 @@ const Overview = () => {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        <div className="p-6 rounded-2xl glass">
-          <h3 className="font-semibold mb-4">Recent Activity</h3>
+        <div className="p-6 rounded-2xl glass-card">
+          <h3 className="font-semibold mb-4 text-foreground">Recent Activity</h3>
           <div className="space-y-4">
             {recentActivity.map((item, i) => (
-              <div key={i} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-                <p className="text-sm">{item.action}</p>
+              <div key={i} className="flex items-center justify-between py-2 border-b border-border/30 last:border-0">
+                <p className="text-sm text-foreground/90">{item.action}</p>
                 <p className="text-xs text-muted-foreground whitespace-nowrap ml-4">{item.time}</p>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="p-6 rounded-2xl glass">
-          <h3 className="font-semibold mb-4">Call Performance</h3>
+        <div className="p-6 rounded-2xl glass-card">
+          <h3 className="font-semibold mb-4 text-foreground">Call Performance</h3>
           <div className="flex items-end justify-between h-48 px-2">
             {[40, 65, 45, 80, 55, 70, 90].map((h, i) => (
               <div key={i} className="flex flex-col items-center gap-2">

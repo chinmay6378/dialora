@@ -7,9 +7,9 @@ const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass">
+    <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/50">
       <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 font-bold text-xl">
+        <Link to="/" className="flex items-center gap-2 font-bold text-xl text-foreground">
           <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
             <Phone className="w-4 h-4 text-primary-foreground" />
           </div>
@@ -23,21 +23,21 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-3">
-          <Button variant="ghost" size="sm" asChild>
+          <Button variant="ghost" size="sm" className="text-foreground" asChild>
             <Link to="/login">Log In</Link>
           </Button>
-          <Button size="sm" className="gradient-primary border-0" asChild>
+          <Button size="sm" className="gradient-primary border-0 btn-glow" asChild>
             <Link to="/signup">Start Free Trial</Link>
           </Button>
         </div>
 
-        <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
+        <button className="md:hidden text-foreground" onClick={() => setMobileOpen(!mobileOpen)}>
           {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
       {mobileOpen && (
-        <div className="md:hidden glass border-t border-border px-6 py-4 space-y-3">
+        <div className="md:hidden glass border-t border-border/50 px-6 py-4 space-y-3">
           <a href="#features" className="block text-sm text-muted-foreground">Features</a>
           <a href="#how-it-works" className="block text-sm text-muted-foreground">How It Works</a>
           <a href="#pricing" className="block text-sm text-muted-foreground">Pricing</a>
