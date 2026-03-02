@@ -5,26 +5,26 @@ const Leads = () => {
   return (
     <div className="space-y-6 max-w-6xl">
       <div>
-        <h1 className="text-3xl font-bold">Leads</h1>
+        <h1 className="text-3xl font-bold text-foreground">Leads</h1>
         <p className="text-muted-foreground mt-1">Upload and manage your lead lists.</p>
       </div>
 
-      <div className="p-12 rounded-2xl border-2 border-dashed border-border hover:border-primary/50 transition-colors text-center space-y-4 cursor-pointer group">
+      <div className="p-12 rounded-2xl border-2 border-dashed border-border/50 hover:border-primary/50 transition-colors text-center space-y-4 cursor-pointer group glass-card">
         <div className="w-16 h-16 rounded-2xl bg-primary/10 mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
           <Upload className="w-8 h-8 text-primary" />
         </div>
         <div>
-          <p className="font-semibold text-lg">Drop your Excel file here</p>
+          <p className="font-semibold text-lg text-foreground">Drop your Excel file here</p>
           <p className="text-sm text-muted-foreground">or click to browse. Supports .xlsx files</p>
         </div>
-        <Button variant="outline" className="rounded-xl">
+        <Button variant="outline" className="rounded-xl border-border/50">
           <FileSpreadsheet className="w-4 h-4 mr-2" /> Select File
         </Button>
       </div>
 
-      <div className="rounded-2xl glass p-6">
+      <div className="rounded-2xl glass-card p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold">Uploaded Lead Lists</h3>
+          <h3 className="font-semibold text-foreground">Uploaded Lead Lists</h3>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Users className="w-4 h-4" /> 1,120 total leads
           </div>
@@ -36,11 +36,11 @@ const Leads = () => {
             { name: "followup_batch3.xlsx", leads: 200, campaign: "Follow-up Batch 3", date: "Feb 10" },
             { name: "re-engagement.xlsx", leads: 150, campaign: "Re-engagement", date: "Feb 18" },
           ].map((file) => (
-            <div key={file.name} className="flex items-center justify-between p-4 rounded-xl hover:bg-muted/30 transition-colors">
+            <div key={file.name} className="flex items-center justify-between p-4 rounded-xl hover:bg-muted/20 transition-colors">
               <div className="flex items-center gap-3">
                 <FileSpreadsheet className="w-5 h-5 text-success" />
                 <div>
-                  <p className="font-medium text-sm">{file.name}</p>
+                  <p className="font-medium text-sm text-foreground">{file.name}</p>
                   <p className="text-xs text-muted-foreground">{file.leads} leads • {file.campaign}</p>
                 </div>
               </div>

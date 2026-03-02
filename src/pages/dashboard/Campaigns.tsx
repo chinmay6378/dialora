@@ -21,18 +21,18 @@ const Campaigns = () => {
     <div className="space-y-6 max-w-6xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Campaigns</h1>
+          <h1 className="text-3xl font-bold text-foreground">Campaigns</h1>
           <p className="text-muted-foreground mt-1">Create and manage your voice campaigns.</p>
         </div>
-        <Button className="gradient-primary border-0 rounded-xl">
+        <Button className="gradient-primary border-0 rounded-xl btn-glow">
           <Plus className="w-4 h-4 mr-2" /> Create Campaign
         </Button>
       </div>
 
-      <div className="rounded-2xl glass overflow-hidden">
+      <div className="rounded-2xl glass-card overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-border">
+            <tr className="border-b border-border/30">
               <th className="text-left p-4 text-sm font-medium text-muted-foreground">Name</th>
               <th className="text-left p-4 text-sm font-medium text-muted-foreground">Status</th>
               <th className="text-left p-4 text-sm font-medium text-muted-foreground">Leads</th>
@@ -43,8 +43,8 @@ const Campaigns = () => {
           </thead>
           <tbody>
             {campaigns.map((c) => (
-              <tr key={c.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
-                <td className="p-4 font-medium">{c.name}</td>
+              <tr key={c.id} className="border-b border-border/20 last:border-0 hover:bg-muted/20 transition-colors">
+                <td className="p-4 font-medium text-foreground">{c.name}</td>
                 <td className="p-4">
                   <Badge className={`rounded-lg ${statusColors[c.status]}`}>{c.status}</Badge>
                 </td>

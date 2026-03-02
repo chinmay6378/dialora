@@ -12,12 +12,12 @@ const HeroSection = () => {
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-4xl mx-auto text-center space-y-8 animate-slide-up">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm font-medium">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm font-medium text-foreground/80">
             <Sparkles className="w-4 h-4 text-primary" />
             <span>Powered by Advanced AI Voice Technology</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold leading-tight tracking-tight">
+          <h1 className="text-5xl md:text-7xl font-bold leading-tight tracking-tight text-foreground">
             AI Voice Agents That{" "}
             <span className="gradient-text">Call, Qualify & Convert</span>{" "}
             Leads Automatically
@@ -28,13 +28,13 @@ const HeroSection = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <Button size="lg" className="gradient-primary border-0 text-lg px-8 py-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105" asChild>
+            <Button size="lg" className="gradient-primary border-0 text-lg px-8 py-6 rounded-xl shadow-lg btn-glow hover:scale-105 transition-all" asChild>
               <Link to="/signup">
                 Start Free Trial
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Link>
             </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-6 rounded-xl glass hover:scale-105 transition-all">
+            <Button variant="outline" size="lg" className="text-lg px-8 py-6 rounded-xl glass hover:scale-105 transition-all text-foreground">
               <Play className="w-5 h-5 mr-2" />
               Watch Demo
             </Button>

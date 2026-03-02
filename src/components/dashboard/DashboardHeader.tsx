@@ -7,7 +7,7 @@ import {
 
 const DashboardHeader = () => {
   return (
-    <header className="h-16 border-b border-border bg-card/80 backdrop-blur-sm flex items-center justify-between px-6 sticky top-0 z-40">
+    <header className="h-16 border-b border-border/50 glass flex items-center justify-between px-6 sticky top-0 z-40">
       <div>
         <h2 className="text-sm font-medium text-muted-foreground">Welcome back</h2>
       </div>
@@ -26,7 +26,7 @@ const DashboardHeader = () => {
               </div>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48 rounded-xl">
+          <DropdownMenuContent align="end" className="w-48 rounded-xl glass border-border/50">
             <DropdownMenuItem asChild>
               <Link to="/dashboard/settings" className="flex items-center gap-2">
                 <User className="w-4 h-4" /> Profile
