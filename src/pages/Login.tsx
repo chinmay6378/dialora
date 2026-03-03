@@ -1,13 +1,30 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Phone } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { signIn } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const { error } = await signIn(email, password);
+    setLoading(false);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      navigate("/dashboard");
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
@@ -28,26 +45,26 @@ const Login = () => {
           <p className="text-muted-foreground mt-1">Sign in to your account</p>
         </div>
 
-        <div className="p-8 rounded-2xl glass-card space-y-6">
+        <form onSubmit={handleSubmit} className="p-8 rounded-2xl glass-card space-y-6">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="you@company.com" value={email} onChange={(e) => setEmail(e.target.value)} className="rounded-xl h-12 bg-background/50 border-border/50" />
+            <Input id="email" type="email" placeholder="you@company.com" value={email} onChange={(e) => setEmail(e.target.value)} className="rounded-xl h-12 bg-background/50 border-border/50" required />
           </div>
           <div className="space-y-2">
             <div className="flex justify-between">
               <Label htmlFor="password">Password</Label>
               <Link to="/forgot-password" className="text-xs text-primary hover:underline">Forgot password?</Link>
             </div>
-            <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="rounded-xl h-12 bg-background/50 border-border/50" />
+            <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="rounded-xl h-12 bg-background/50 border-border/50" required />
           </div>
-          <Button className="w-full gradient-primary border-0 rounded-xl h-12 text-base btn-glow">
-            Sign In
+          <Button type="submit" className="w-full gradient-primary border-0 rounded-xl h-12 text-base btn-glow" disabled={loading}>
+            {loading ? "Signing in..." : "Sign In"}
           </Button>
           <p className="text-center text-sm text-muted-foreground">
             Don't have an account?{" "}
             <Link to="/signup" className="text-primary hover:underline font-medium">Sign up</Link>
           </p>
-        </div>
+        </form>
       </div>
     </div>
   );

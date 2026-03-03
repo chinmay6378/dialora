@@ -4,6 +4,8 @@ import {
   LayoutDashboard, Megaphone, Users, BookOpen, PhoneCall, CreditCard, Settings, Phone, ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { useState } from "react";
+import { useCredits } from "@/hooks/useCredits";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const navItems = [
   { title: "Overview", path: "/dashboard", icon: LayoutDashboard },
@@ -18,6 +20,7 @@ const navItems = [
 const DashboardSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const { balance, loading } = useCredits();
 
   return (
     <aside
@@ -68,7 +71,11 @@ const DashboardSidebar = () => {
         {!collapsed && (
           <div className="p-3 rounded-xl glass text-center">
             <p className="text-xs text-muted-foreground">Credits Remaining</p>
-            <p className="text-lg font-bold text-primary">247</p>
+            {loading ? (
+              <Skeleton className="w-12 h-7 mx-auto mt-1" />
+            ) : (
+              <p className="text-lg font-bold text-primary">{balance ?? 0}</p>
+            )}
           </div>
         )}
       </div>
