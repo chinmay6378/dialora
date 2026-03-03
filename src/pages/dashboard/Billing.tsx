@@ -1,5 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { CreditCard, ArrowRight } from "lucide-react";
+import { CreditCard, ArrowRight, Loader2 } from "lucide-react";
+import { useCredits } from "@/hooks/useCredits";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const packages = [
   { credits: 100, price: "$19", perCredit: "$0.19", popular: false },
@@ -7,14 +11,38 @@ const packages = [
   { credits: 1000, price: "$89", perCredit: "$0.089", popular: false },
 ];
 
-const transactions = [
-  { date: "Feb 18", type: "Purchase", amount: "+500 credits", price: "$49.00" },
-  { date: "Feb 15", type: "Usage", amount: "-87 credits", price: "Campaign: Follow-up Batch 3" },
-  { date: "Feb 10", type: "Usage", amount: "-166 credits", price: "Campaign: Q1 Outreach" },
-  { date: "Jan 30", type: "Purchase", amount: "+100 credits", price: "$19.00" },
-];
+interface Transaction {
+  id: string;
+  amount: number;
+  type: string;
+  description: string | null;
+  created_at: string;
+}
 
 const Billing = () => {
+  const { balance, loading: balLoading } = useCredits();
+  const { user } = useAuth();
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetch = async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from("credit_transactions")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(20);
+      setTransactions((data as Transaction[]) ?? []);
+      setLoading(false);
+    };
+    fetch();
+  }, [user]);
+
+  if (loading || balLoading) {
+    return <div className="flex items-center justify-center h-64"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>;
+  }
+
   return (
     <div className="space-y-8 max-w-6xl">
       <div>
@@ -29,13 +57,14 @@ const Billing = () => {
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Current Balance</p>
-            <p className="text-3xl font-bold text-foreground">247 <span className="text-lg font-normal text-muted-foreground">credits</span></p>
+            <p className="text-3xl font-bold text-foreground">{balance ?? 0} <span className="text-lg font-normal text-muted-foreground">credits</span></p>
           </div>
         </div>
       </div>
 
       <div>
         <h3 className="font-semibold text-lg mb-4 text-foreground">Buy Credits</h3>
+        <p className="text-sm text-muted-foreground mb-4">Payment integration coming soon (Razorpay).</p>
         <div className="grid md:grid-cols-3 gap-4">
           {packages.map((pkg) => (
             <div key={pkg.credits} className={`p-6 rounded-2xl transition-all ${pkg.popular ? "gradient-primary text-primary-foreground shadow-lg btn-glow" : "glass-card"}`}>
@@ -44,8 +73,8 @@ const Billing = () => {
               <p className={`text-sm ${pkg.popular ? "opacity-80" : "text-muted-foreground"}`}>credits</p>
               <p className="text-2xl font-bold mt-4">{pkg.price}</p>
               <p className={`text-xs mt-1 ${pkg.popular ? "opacity-70" : "text-muted-foreground"}`}>{pkg.perCredit}/credit</p>
-              <Button className={`w-full mt-6 rounded-xl ${pkg.popular ? "bg-background text-foreground hover:bg-background/90" : "gradient-primary border-0 btn-glow"}`}>
-                Buy Now <ArrowRight className="w-4 h-4 ml-2" />
+              <Button disabled className={`w-full mt-6 rounded-xl ${pkg.popular ? "bg-background text-foreground hover:bg-background/90" : "gradient-primary border-0 btn-glow"}`}>
+                Coming Soon <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </div>
           ))}
@@ -54,28 +83,36 @@ const Billing = () => {
 
       <div>
         <h3 className="font-semibold text-lg mb-4 text-foreground">Transaction History</h3>
-        <div className="rounded-2xl glass-card overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-border/30">
-                <th className="text-left p-4 text-sm font-medium text-muted-foreground">Date</th>
-                <th className="text-left p-4 text-sm font-medium text-muted-foreground">Type</th>
-                <th className="text-left p-4 text-sm font-medium text-muted-foreground">Amount</th>
-                <th className="text-left p-4 text-sm font-medium text-muted-foreground">Details</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.map((t, i) => (
-                <tr key={i} className="border-b border-border/20 last:border-0 hover:bg-muted/20 transition-colors">
-                  <td className="p-4 text-sm text-foreground">{t.date}</td>
-                  <td className="p-4 text-sm text-foreground">{t.type}</td>
-                  <td className={`p-4 text-sm font-medium ${t.amount.startsWith("+") ? "text-success" : "text-destructive"}`}>{t.amount}</td>
-                  <td className="p-4 text-sm text-muted-foreground">{t.price}</td>
+        {transactions.length === 0 ? (
+          <div className="p-8 rounded-2xl glass-card text-center">
+            <p className="text-muted-foreground">No transactions yet.</p>
+          </div>
+        ) : (
+          <div className="rounded-2xl glass-card overflow-hidden">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-border/30">
+                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Date</th>
+                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Type</th>
+                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Amount</th>
+                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Details</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {transactions.map((t) => (
+                  <tr key={t.id} className="border-b border-border/20 last:border-0 hover:bg-muted/20 transition-colors">
+                    <td className="p-4 text-sm text-foreground">{new Date(t.created_at).toLocaleDateString()}</td>
+                    <td className="p-4 text-sm text-foreground">{t.type}</td>
+                    <td className={`p-4 text-sm font-medium ${t.amount > 0 ? "text-success" : "text-destructive"}`}>
+                      {t.amount > 0 ? "+" : ""}{t.amount} credits
+                    </td>
+                    <td className="p-4 text-sm text-muted-foreground">{t.description || "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

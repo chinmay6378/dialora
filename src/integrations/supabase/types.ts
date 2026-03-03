@@ -14,16 +14,325 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      call_results: {
+        Row: {
+          call_sid: string | null
+          campaign_id: string
+          created_at: string
+          duration: number | null
+          id: string
+          lead_id: string
+          notes: string | null
+          recording_url: string | null
+          sentiment: string | null
+          status: string
+          transcript: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          call_sid?: string | null
+          campaign_id: string
+          created_at?: string
+          duration?: number | null
+          id?: string
+          lead_id: string
+          notes?: string | null
+          recording_url?: string | null
+          sentiment?: string | null
+          status?: string
+          transcript?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          call_sid?: string | null
+          campaign_id?: string
+          created_at?: string
+          duration?: number | null
+          id?: string
+          lead_id?: string
+          notes?: string | null
+          recording_url?: string | null
+          sentiment?: string | null
+          status?: string
+          transcript?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_results_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "call_results_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaigns: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          n8n_webhook_url: string | null
+          name: string
+          processed_leads: number
+          status: Database["public"]["Enums"]["campaign_status"]
+          total_leads: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          n8n_webhook_url?: string | null
+          name: string
+          processed_leads?: number
+          status?: Database["public"]["Enums"]["campaign_status"]
+          total_leads?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          n8n_webhook_url?: string | null
+          name?: string
+          processed_leads?: number
+          status?: Database["public"]["Enums"]["campaign_status"]
+          total_leads?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      credit_transactions: {
+        Row: {
+          amount: number
+          campaign_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          campaign_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          campaign_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      credits_balance: {
+        Row: {
+          balance: number
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      knowledge_base: {
+        Row: {
+          chunk_index: number | null
+          content: string
+          created_at: string
+          embedding: string | null
+          file_type: string | null
+          file_url: string | null
+          id: string
+          metadata: Json | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          chunk_index?: number | null
+          content: string
+          created_at?: string
+          embedding?: string | null
+          file_type?: string | null
+          file_url?: string | null
+          id?: string
+          metadata?: Json | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          chunk_index?: number | null
+          content?: string
+          created_at?: string
+          embedding?: string | null
+          file_type?: string | null
+          file_url?: string | null
+          id?: string
+          metadata?: Json | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          email: string | null
+          id: string
+          metadata: Json | null
+          name: string | null
+          phone_number: string
+          status: Database["public"]["Enums"]["lead_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          metadata?: Json | null
+          name?: string | null
+          phone_number: string
+          status?: Database["public"]["Enums"]["lead_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          metadata?: Json | null
+          name?: string | null
+          phone_number?: string
+          status?: Database["public"]["Enums"]["lead_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          company_name: string | null
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          company_name?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          company_name?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_campaign_credits: {
+        Args: { p_campaign_id: string }
+        Returns: boolean
+      }
+      deduct_credit: {
+        Args: {
+          p_campaign_id: string
+          p_description?: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
+      match_knowledge_base: {
+        Args: {
+          match_count?: number
+          match_threshold?: number
+          p_user_id?: string
+          query_embedding: string
+        }
+        Returns: {
+          content: string
+          id: string
+          similarity: number
+          title: string
+        }[]
+      }
     }
     Enums: {
-      [_ in never]: never
+      campaign_status:
+        | "draft"
+        | "pending"
+        | "calling"
+        | "paused"
+        | "completed"
+        | "failed"
+      lead_status: "pending" | "calling" | "completed" | "failed" | "skipped"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +459,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      campaign_status: [
+        "draft",
+        "pending",
+        "calling",
+        "paused",
+        "completed",
+        "failed",
+      ],
+      lead_status: ["pending", "calling", "completed", "failed", "skipped"],
+    },
   },
 } as const
