@@ -65,13 +65,29 @@ const Campaigns = () => {
   }, [user]);
 
   const createCampaign = async () => {
-    if (!newName.trim()) return;
+    if (!newName.trim()) {
+      toast.error("Campaign name is required");
+      return;
+    }
+
+    if (!newWebhook.trim()) {
+      toast.error("n8n webhook URL is required");
+      return;
+    }
+
+    try {
+      new URL(newWebhook.trim());
+    } catch {
+      toast.error("Please enter a valid n8n webhook URL");
+      return;
+    }
+
     setCreating(true);
     const { error } = await supabase.from("campaigns").insert({
       user_id: user!.id,
       name: newName.trim(),
       description: newDesc.trim() || null,
-      n8n_webhook_url: newWebhook.trim() || null,
+      n8n_webhook_url: newWebhook.trim(),
     });
     setCreating(false);
     if (error) {
