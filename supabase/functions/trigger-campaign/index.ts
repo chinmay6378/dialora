@@ -77,6 +77,17 @@ serve(async (req) => {
         throw new Error(`Insufficient credits. Need ${totalLeads}, have ${balance}`);
       }
 
+      const n8nWebhookUrl = campaign.n8n_webhook_url?.trim();
+      if (!n8nWebhookUrl) {
+        throw new Error("Campaign webhook is not configured. Add n8n webhook URL before starting.");
+      }
+
+      try {
+        new URL(n8nWebhookUrl);
+      } catch {
+        throw new Error("Campaign webhook URL is invalid");
+      }
+
       // Update campaign status
       await adminClient
         .from("campaigns")
@@ -92,10 +103,9 @@ serve(async (req) => {
         .order("created_at", { ascending: true });
 
       // Process leads sequentially via n8n
-      const n8nWebhookUrl = campaign.n8n_webhook_url;
       let processedCount = campaign.processed_leads || 0;
 
-      if (leads && n8nWebhookUrl) {
+      if (leads && leads.length > 0) {
         for (const lead of leads) {
           // Check if campaign was paused
           const { data: currentCampaign } = await adminClient
@@ -105,6 +115,26 @@ serve(async (req) => {
             .single();
 
           if (currentCampaign?.status === "paused") break;
+
+          // Trigger n8n webhook first; only charge credits if dispatch succeeds
+          const webhookResponse = await fetch(n8nWebhookUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              lead_id: lead.id,
+              campaign_id: campaign_id,
+              user_id: user.id,
+              phone_number: lead.phone_number,
+              lead_name: lead.name,
+              lead_email: lead.email,
+              metadata: lead.metadata,
+            }),
+          });
+
+          if (!webhookResponse.ok) {
+            console.error("n8n webhook failed for lead:", lead.id, webhookResponse.status);
+            continue;
+          }
 
           // Deduct credit
           const { data: deducted } = await adminClient.rpc("deduct_credit", {
@@ -120,25 +150,6 @@ serve(async (req) => {
 
           // Update lead status
           await adminClient.from("leads").update({ status: "calling" }).eq("id", lead.id);
-
-          // Trigger n8n webhook
-          try {
-            await fetch(n8nWebhookUrl, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                lead_id: lead.id,
-                campaign_id: campaign_id,
-                user_id: user.id,
-                phone_number: lead.phone_number,
-                lead_name: lead.name,
-                lead_email: lead.email,
-                metadata: lead.metadata,
-              }),
-            });
-          } catch (e) {
-            console.error("n8n webhook failed for lead:", lead.id, e);
-          }
 
           processedCount++;
           await adminClient
@@ -156,7 +167,16 @@ serve(async (req) => {
         .single();
 
       if (finalCampaign?.status === "calling") {
-        await adminClient.from("campaigns").update({ status: "completed" }).eq("id", campaign_id);
+        const { count: remainingPending } = await adminClient
+          .from("leads")
+          .select("*", { count: "exact", head: true })
+          .eq("campaign_id", campaign_id)
+          .eq("status", "pending");
+
+        await adminClient
+          .from("campaigns")
+          .update({ status: (remainingPending ?? 0) > 0 ? "pending" : "completed" })
+          .eq("id", campaign_id);
       }
 
       return new Response(JSON.stringify({ success: true, processed: processedCount }), {
