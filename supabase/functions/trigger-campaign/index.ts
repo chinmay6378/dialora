@@ -6,6 +6,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const TWILIO_ACCOUNT_SID = "AC14dc76615cb5f3d1aef30f23c3554326";
+const TWILIO_FROM_NUMBER = "+18126904144";
+const TWILIO_TWIML_URL = "https://darshan-narsingkar.app.n8n.cloud/webhook/twiml";
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -25,7 +29,6 @@ serve(async (req) => {
     const { campaign_id, action } = await req.json();
     if (!campaign_id) throw new Error("campaign_id required");
 
-    // Use service role for privileged operations
     const adminClient = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
@@ -77,16 +80,15 @@ serve(async (req) => {
         throw new Error(`Insufficient credits. Need ${totalLeads}, have ${balance}`);
       }
 
-      const n8nWebhookUrl = campaign.n8n_webhook_url?.trim();
-      if (!n8nWebhookUrl) {
-        throw new Error("Campaign webhook is not configured. Add n8n webhook URL before starting.");
+      // Get Twilio auth token
+      const twilioAuthToken = Deno.env.get("TWILIO_AUTH_TOKEN");
+      if (!twilioAuthToken) {
+        throw new Error("Twilio is not configured. Please contact support.");
       }
 
-      try {
-        new URL(n8nWebhookUrl);
-      } catch {
-        throw new Error("Campaign webhook URL is invalid");
-      }
+      // Build the status callback URL pointing to our edge function
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const statusCallbackUrl = `${supabaseUrl}/functions/v1/call-status-callback`;
 
       // Update campaign status
       await adminClient
@@ -102,7 +104,6 @@ serve(async (req) => {
         .eq("status", "pending")
         .order("created_at", { ascending: true });
 
-      // Process leads sequentially via n8n
       let processedCount = campaign.processed_leads || 0;
 
       if (leads && leads.length > 0) {
@@ -116,40 +117,89 @@ serve(async (req) => {
 
           if (currentCampaign?.status === "paused") break;
 
-          // Trigger n8n webhook first; only charge credits if dispatch succeeds
-          const webhookResponse = await fetch(n8nWebhookUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              lead_id: lead.id,
-              campaign_id: campaign_id,
+          // Make Twilio call directly
+          const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Calls.json`;
+          const twilioAuth = btoa(`${TWILIO_ACCOUNT_SID}:${twilioAuthToken}`);
+
+          const callBody = new URLSearchParams({
+            To: `+91${lead.phone_number}`,
+            From: TWILIO_FROM_NUMBER,
+            Url: TWILIO_TWIML_URL,
+            Method: "POST",
+            StatusCallback: statusCallbackUrl,
+            StatusCallbackEvent: "completed",
+            StatusCallbackMethod: "POST",
+          });
+
+          // Include metadata for status callback
+          callBody.append("StatusCallbackEvent", "initiated");
+          callBody.append("StatusCallbackEvent", "ringing");
+          callBody.append("StatusCallbackEvent", "answered");
+
+          try {
+            const twilioResponse = await fetch(twilioUrl, {
+              method: "POST",
+              headers: {
+                "Authorization": `Basic ${twilioAuth}`,
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+              body: callBody.toString(),
+            });
+
+            const twilioResult = await twilioResponse.json();
+
+            if (!twilioResponse.ok) {
+              console.error("Twilio API error for lead:", lead.id, twilioResult);
+              await adminClient.from("leads").update({ status: "failed" }).eq("id", lead.id);
+
+              // Insert failed call result
+              await adminClient.from("call_results").insert({
+                user_id: user.id,
+                campaign_id: campaign_id,
+                lead_id: lead.id,
+                status: "failed",
+                notes: `Twilio error: ${twilioResult.message || "Unknown error"}`,
+              });
+
+              processedCount++;
+              await adminClient
+                .from("campaigns")
+                .update({ processed_leads: processedCount })
+                .eq("id", campaign_id);
+              continue;
+            }
+
+            // Deduct credit after successful call initiation
+            const { data: deducted } = await adminClient.rpc("deduct_credit", {
+              p_user_id: user.id,
+              p_campaign_id: campaign_id,
+              p_description: `Call to +91${lead.phone_number}`,
+            });
+
+            if (!deducted) {
+              await adminClient.from("campaigns").update({ status: "failed" }).eq("id", campaign_id);
+              throw new Error("Credit deduction failed");
+            }
+
+            // Update lead status and store call SID
+            await adminClient
+              .from("leads")
+              .update({ status: "calling", metadata: { ...lead.metadata, call_sid: twilioResult.sid } })
+              .eq("id", lead.id);
+
+            // Insert initial call result with call SID
+            await adminClient.from("call_results").insert({
               user_id: user.id,
-              phone_number: lead.phone_number,
-              lead_name: lead.name,
-              lead_email: lead.email,
-              metadata: lead.metadata,
-            }),
-          });
+              campaign_id: campaign_id,
+              lead_id: lead.id,
+              call_sid: twilioResult.sid,
+              status: "initiated",
+            });
 
-          if (!webhookResponse.ok) {
-            console.error("n8n webhook failed for lead:", lead.id, webhookResponse.status);
-            continue;
+          } catch (e) {
+            console.error("Failed to call lead:", lead.id, e);
+            await adminClient.from("leads").update({ status: "failed" }).eq("id", lead.id);
           }
-
-          // Deduct credit
-          const { data: deducted } = await adminClient.rpc("deduct_credit", {
-            p_user_id: user.id,
-            p_campaign_id: campaign_id,
-            p_description: `Call to ${lead.phone_number}`,
-          });
-
-          if (!deducted) {
-            await adminClient.from("campaigns").update({ status: "failed" }).eq("id", campaign_id);
-            throw new Error("Credit deduction failed");
-          }
-
-          // Update lead status
-          await adminClient.from("leads").update({ status: "calling" }).eq("id", lead.id);
 
           processedCount++;
           await adminClient

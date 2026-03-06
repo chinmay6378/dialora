@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Play, Pause, MoreHorizontal, Loader2 } from "lucide-react";
+import { Plus, Play, Pause, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -26,7 +26,6 @@ interface Campaign {
   status: string;
   total_leads: number;
   processed_leads: number;
-  n8n_webhook_url: string | null;
   created_at: string;
 }
 
@@ -38,7 +37,6 @@ const Campaigns = () => {
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState("");
   const [newDesc, setNewDesc] = useState("");
-  const [newWebhook, setNewWebhook] = useState("");
   const [creating, setCreating] = useState(false);
 
   const fetchCampaigns = async () => {
@@ -70,24 +68,11 @@ const Campaigns = () => {
       return;
     }
 
-    if (!newWebhook.trim()) {
-      toast.error("n8n webhook URL is required");
-      return;
-    }
-
-    try {
-      new URL(newWebhook.trim());
-    } catch {
-      toast.error("Please enter a valid n8n webhook URL");
-      return;
-    }
-
     setCreating(true);
     const { error } = await supabase.from("campaigns").insert({
       user_id: user!.id,
       name: newName.trim(),
       description: newDesc.trim() || null,
-      n8n_webhook_url: newWebhook.trim(),
     });
     setCreating(false);
     if (error) {
@@ -97,16 +82,14 @@ const Campaigns = () => {
       setShowCreate(false);
       setNewName("");
       setNewDesc("");
-      setNewWebhook("");
       fetchCampaigns();
     }
   };
 
   const triggerAction = async (campaignId: string, action: string) => {
-    if (actionLoading) return; // prevent duplicate
+    if (actionLoading) return;
     setActionLoading(campaignId);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
       const res = await supabase.functions.invoke("trigger-campaign", {
         body: { campaign_id: campaignId, action },
       });
@@ -155,10 +138,6 @@ const Campaigns = () => {
               <div className="space-y-2">
                 <Label>Description</Label>
                 <Textarea value={newDesc} onChange={(e) => setNewDesc(e.target.value)} placeholder="Campaign description..." className="rounded-xl bg-background/50 border-border/50" />
-              </div>
-              <div className="space-y-2">
-                <Label>n8n Webhook URL</Label>
-                <Input value={newWebhook} onChange={(e) => setNewWebhook(e.target.value)} placeholder="https://your-n8n.app/webhook/..." className="rounded-xl bg-background/50 border-border/50" />
               </div>
               <Button onClick={createCampaign} disabled={creating} className="w-full gradient-primary border-0 rounded-xl btn-glow">
                 {creating ? "Creating..." : "Create Campaign"}
