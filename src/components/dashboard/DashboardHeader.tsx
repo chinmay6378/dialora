@@ -25,7 +25,7 @@ const DashboardHeader = () => {
   return (
     <header className="h-16 border-b border-border/50 glass flex items-center justify-between px-6 sticky top-0 z-40">
       <div>
-        <h2 className="text-sm font-medium text-muted-foreground">Welcome back</h2>
+        <h2 className="text-sm font-medium text-muted-foreground">Welcome back, <span className="text-foreground">{user?.user_metadata?.display_name || user?.email?.split("@")[0] || "User"}</span></h2>
       </div>
 
       <div className="flex items-center gap-4">

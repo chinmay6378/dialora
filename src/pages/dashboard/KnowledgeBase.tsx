@@ -1,77 +1,63 @@
 import { Button } from "@/components/ui/button";
-import { Upload, FileText, Trash2, Database, Loader2 } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { Upload, FileText, Trash2, Database, File, FileType } from "lucide-react";
+import { useState, useRef } from "react";
 import { toast } from "sonner";
 
 interface KBDoc {
   id: string;
   title: string;
-  content: string;
-  file_type: string | null;
-  chunk_index: number;
-  created_at: string;
+  fileType: string;
+  size: string;
+  uploadedAt: string;
 }
 
+const initialDocs: KBDoc[] = [
+  { id: "d1", title: "Product Catalog 2026.pdf", fileType: "pdf", size: "2.4 MB", uploadedAt: "2026-03-01" },
+  { id: "d2", title: "Sales Objection Handling.md", fileType: "md", size: "48 KB", uploadedAt: "2026-02-28" },
+  { id: "d3", title: "Company Overview.txt", fileType: "txt", size: "12 KB", uploadedAt: "2026-02-25" },
+  { id: "d4", title: "Pricing & Plans.csv", fileType: "csv", size: "8 KB", uploadedAt: "2026-02-20" },
+];
+
+const fileIcons: Record<string, typeof FileText> = {
+  pdf: File,
+  md: FileType,
+  txt: FileText,
+  csv: FileText,
+};
+
 const KnowledgeBase = () => {
-  const { user } = useAuth();
-  const [docs, setDocs] = useState<KBDoc[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [docs, setDocs] = useState<KBDoc[]>(initialDocs);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-
-  const fetchDocs = async () => {
-    if (!user) return;
-    const { data } = await supabase
-      .from("knowledge_base")
-      .select("*")
-      .eq("chunk_index", 0) // Only show first chunk per doc
-      .order("created_at", { ascending: false });
-    setDocs((data as KBDoc[]) ?? []);
-    setLoading(false);
-  };
-
-  useEffect(() => { fetchDocs(); }, [user]);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    try {
-      const content = await file.text();
-      const res = await supabase.functions.invoke("upload-document", {
-        body: { title: file.name, content, file_type: file.type },
-      });
-      if (res.error) throw new Error(res.error.message);
-      if (res.data?.error) throw new Error(res.data.error);
-      toast.success(`${file.name} uploaded (${res.data.chunks} chunks)`);
-      fetchDocs();
-    } catch (err: any) {
-      toast.error(err.message);
-    } finally {
-      setUploading(false);
-      if (fileRef.current) fileRef.current.value = "";
-    }
+    
+    // Simulate upload delay
+    await new Promise((r) => setTimeout(r, 1500));
+    
+    const newDoc: KBDoc = {
+      id: Date.now().toString(),
+      title: file.name,
+      fileType: file.name.split(".").pop() || "txt",
+      size: file.size > 1024 * 1024 
+        ? `${(file.size / (1024 * 1024)).toFixed(1)} MB` 
+        : `${Math.round(file.size / 1024)} KB`,
+      uploadedAt: new Date().toISOString().split("T")[0],
+    };
+    
+    setDocs([newDoc, ...docs]);
+    toast.success(`${file.name} uploaded successfully`);
+    setUploading(false);
+    if (fileRef.current) fileRef.current.value = "";
   };
 
-  const deleteDoc = async (title: string) => {
-    // Delete all chunks with this base title
-    const baseTitle = title.replace(/ \(chunk \d+\)$/, "");
-    const { error } = await supabase
-      .from("knowledge_base")
-      .delete()
-      .like("title", `${baseTitle}%`);
-    if (error) toast.error(error.message);
-    else {
-      toast.success("Document deleted");
-      fetchDocs();
-    }
+  const deleteDoc = (id: string) => {
+    setDocs(docs.filter((d) => d.id !== id));
+    toast.success("Document deleted");
   };
-
-  if (loading) {
-    return <div className="flex items-center justify-center h-64"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>;
-  }
 
   return (
     <div className="space-y-6 max-w-6xl">
@@ -81,16 +67,16 @@ const KnowledgeBase = () => {
       </div>
 
       <div
-        className="p-12 rounded-2xl border-2 border-dashed border-border/50 hover:border-primary/50 transition-colors text-center space-y-4 cursor-pointer group glass-card"
+        className="p-10 rounded-2xl border-2 border-dashed border-border/50 hover:border-primary/50 transition-colors text-center space-y-3 cursor-pointer group glass-card"
         onClick={() => fileRef.current?.click()}
       >
-        <input ref={fileRef} type="file" accept=".txt,.md,.csv" className="hidden" onChange={handleUpload} />
-        <div className="w-16 h-16 rounded-2xl bg-primary/10 mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
-          {uploading ? <Loader2 className="w-8 h-8 text-primary animate-spin" /> : <Upload className="w-8 h-8 text-primary" />}
+        <input ref={fileRef} type="file" accept=".txt,.md,.csv,.pdf" className="hidden" onChange={handleUpload} />
+        <div className="w-14 h-14 rounded-2xl bg-primary/10 mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
+          <Upload className="w-7 h-7 text-primary" />
         </div>
         <div>
-          <p className="font-semibold text-lg text-foreground">{uploading ? "Processing..." : "Upload knowledge documents"}</p>
-          <p className="text-sm text-muted-foreground">Text or Markdown files. Your AI will learn from these.</p>
+          <p className="font-semibold text-foreground">{uploading ? "Processing document..." : "Upload knowledge documents"}</p>
+          <p className="text-sm text-muted-foreground">PDF, Text, Markdown, or CSV files. Your AI will learn from these.</p>
         </div>
         <Button variant="outline" className="rounded-xl border-border/50" disabled={uploading}>
           <FileText className="w-4 h-4 mr-2" /> Select Files
@@ -104,22 +90,32 @@ const KnowledgeBase = () => {
       </div>
 
       <div className="space-y-3">
-        {docs.map((doc) => (
-          <div key={doc.id} className="flex items-center justify-between p-5 rounded-2xl glass-card">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <FileText className="w-5 h-5 text-primary" />
+        {docs.map((doc) => {
+          const Icon = fileIcons[doc.fileType] || FileText;
+          return (
+            <div key={doc.id} className="flex items-center justify-between p-5 rounded-2xl glass-card">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Icon className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">{doc.title}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {doc.fileType.toUpperCase()} • {doc.size} • Uploaded {doc.uploadedAt}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="font-medium text-foreground">{doc.title}</p>
-                <p className="text-xs text-muted-foreground">{doc.file_type || "text"} • Uploaded {new Date(doc.created_at).toLocaleDateString()}</p>
-              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10"
+                onClick={() => deleteDoc(doc.id)}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
             </div>
-            <Button variant="ghost" size="icon" className="rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => deleteDoc(doc.title)}>
-              <Trash2 className="w-4 h-4" />
-            </Button>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
