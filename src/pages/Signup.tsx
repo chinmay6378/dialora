@@ -23,8 +23,8 @@ const Signup = () => {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success("Account created! Please check your email to verify your account.");
-      navigate("/login");
+      toast.success("Account created! Welcome to Dialora.");
+      navigate("/dashboard");
     }
   };
 
@@ -41,10 +41,10 @@ const Signup = () => {
             <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
               <Phone className="w-4 h-4 text-primary-foreground" />
             </div>
-            VoiceAI Pro
+            Dialora
           </Link>
           <h1 className="text-2xl font-bold text-foreground">Create your account</h1>
-          <p className="text-muted-foreground mt-1">Start your free trial today</p>
+          <p className="text-muted-foreground mt-1">Start your free trial with 100 credits</p>
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 rounded-2xl glass-card space-y-6">

@@ -39,7 +39,7 @@ const Login = () => {
             <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
               <Phone className="w-4 h-4 text-primary-foreground" />
             </div>
-            VoiceAI Pro
+            Dialora
           </Link>
           <h1 className="text-2xl font-bold text-foreground">Welcome back</h1>
           <p className="text-muted-foreground mt-1">Sign in to your account</p>

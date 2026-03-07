@@ -11,7 +11,7 @@ const Footer = () => {
               <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
                 <Phone className="w-4 h-4 text-primary-foreground" />
               </div>
-              VoiceAI Pro
+              Dialora
             </Link>
             <p className="text-sm text-muted-foreground">AI-powered voice agents for automated outbound sales.</p>
           </div>
@@ -41,7 +41,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="border-t border-border/50 mt-12 pt-8 text-center text-sm text-muted-foreground">
-          © 2026 VoiceAI Pro. All rights reserved.
+          © 2026 Dialora. All rights reserved.
         </div>
       </div>
     </footer>

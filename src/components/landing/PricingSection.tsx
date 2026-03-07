@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
+import { Check, IndianRupee } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const plans = [
-  { name: "Starter", credits: "100", price: "$19", description: "Perfect for testing the waters", features: ["100 AI call credits", "5 campaigns", "1 knowledge doc", "Email support", "Basic analytics"], popular: false },
-  { name: "Growth", credits: "500", price: "$49", description: "For growing sales teams", features: ["500 AI call credits", "Unlimited campaigns", "10 knowledge docs", "Priority support", "Advanced analytics", "Custom AI scripts"], popular: true },
-  { name: "Scale", credits: "1000", price: "$89", description: "For high-volume outreach", features: ["1,000 AI call credits", "Unlimited campaigns", "Unlimited docs", "Dedicated support", "Full analytics suite", "API access", "Team seats"], popular: false },
+  { name: "Starter", credits: "100", price: "1,599", description: "Perfect for testing the waters", features: ["100 AI call credits", "5 campaigns", "1 knowledge doc", "Email support", "Basic analytics"], popular: false },
+  { name: "Growth", credits: "500", price: "3,999", description: "For growing sales teams", features: ["500 AI call credits", "Unlimited campaigns", "10 knowledge docs", "Priority support", "Advanced analytics", "Custom AI scripts"], popular: true },
+  { name: "Scale", credits: "1000", price: "6,999", description: "For high-volume outreach", features: ["1,000 AI call credits", "Unlimited campaigns", "Unlimited docs", "Dedicated support", "Full analytics suite", "API access", "Team seats"], popular: false },
 ];
 
 const PricingSection = () => {
@@ -40,7 +40,8 @@ const PricingSection = () => {
                     {plan.description}
                   </p>
                 </div>
-                <div>
+                <div className="flex items-baseline gap-0.5">
+                  <IndianRupee className="w-6 h-6" />
                   <span className="text-5xl font-bold">{plan.price}</span>
                   <span className={`text-sm ml-2 ${plan.popular ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
                     / {plan.credits} credits

@@ -34,7 +34,7 @@ const DashboardSidebar = () => {
             <div className="w-7 h-7 rounded-lg gradient-primary flex items-center justify-center">
               <Phone className="w-3.5 h-3.5 text-primary-foreground" />
             </div>
-            <span className="text-sm">VoiceAI Pro</span>
+            <span className="text-sm">Dialora</span>
           </div>
         )}
         <button
