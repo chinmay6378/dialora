@@ -5,7 +5,6 @@ import { ArrowRight, Play, Sparkles } from "lucide-react";
 const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
-      {/* Animated gradient background */}
       <div className="absolute inset-0 gradient-hero animate-gradient" />
       <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-primary/10 blur-3xl animate-float" />
       <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-accent/10 blur-3xl animate-float" style={{ animationDelay: "3s" }} />
@@ -47,7 +46,7 @@ const HeroSection = () => {
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-success" />
-              50 free credits
+              100 free credits
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-success" />

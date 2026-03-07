@@ -13,7 +13,7 @@ const Navbar = () => {
           <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
             <Phone className="w-4 h-4 text-primary-foreground" />
           </div>
-          <span>VoiceAI Pro</span>
+          <span>Dialora</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
