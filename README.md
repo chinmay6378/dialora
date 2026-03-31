@@ -21,7 +21,7 @@
 
 <br/>
 
-![Dialora Dashboard Preview](https://placehold.co/900x480/0f1020/6366f1?text=Dialora+Dashboard&font=montserrat)
+![Dialora Dashboard Preview](https://dialora.lovable.app/)
 
 </div>
 
