@@ -21,7 +21,7 @@
 
 <br/>
 
-![Dialora Dashboard Preview](https://dialora.lovable.app/)
+![Dialora Dashboard Preview](https://drive.google.com/file/d/18uYdQecK6N9r17SW4qp4todYB2-rh1JL/view?usp=sharing)
 
 </div>
 
