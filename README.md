@@ -20,6 +20,8 @@
 > Upload your leads, set up your knowledge base, launch a campaign — and let Sameera do the talking.
 
 <br/>
+<img width="1897" height="905" alt="Screenshot 2026-04-01 012339" src="https://github.com/user-attachments/assets/2a3d5f5b-418c-4949-bc0e-dff4c6c16990" />
+
 <img width="1891" height="902" alt="Screenshot 2026-04-01 012443" src="https://github.com/user-attachments/assets/9a072079-a191-4d8a-9a04-788205265643" />
 </div>
 
