@@ -20,9 +20,7 @@
 > Upload your leads, set up your knowledge base, launch a campaign — and let Sameera do the talking.
 
 <br/>
-
-![Dialora Dashboard Preview](https://drive.google.com/file/d/18uYdQecK6N9r17SW4qp4todYB2-rh1JL/view?usp=sharing)
-
+<img width="1891" height="902" alt="Screenshot 2026-04-01 012443" src="https://github.com/user-attachments/assets/9a072079-a191-4d8a-9a04-788205265643" />
 </div>
 
 ---
